@@ -10,7 +10,7 @@ services:
       context: . # Use an image built from the specified dockerfile in the current directory.
       dockerfile: Dockerfile
     ports:
-      - "9000:9000" # Forward the exposed port 8080 on the container to port 8080 on the host machine
+      - "9000:9000" # Forward the exposed port on the container to port on the host machine
     restart: unless-stopped
     depends_on: 
       - redis # This service depends on redis. Start that first.

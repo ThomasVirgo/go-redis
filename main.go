@@ -3,8 +3,10 @@ package main
 import (
 	"context"
 	"fmt"
+	"html/template"
 	"log"
 	"net/http"
+	"path/filepath"
 
 	"github.com/redis/go-redis/v9"
 )
@@ -23,9 +25,11 @@ func main() {
 		log.Fatal(err)
 	}
 
+	templates := template.Must(template.ParseGlob(filepath.Join("templates", "*.html")))
+
 	router := http.NewServeMux()
 	router.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("hello hetzner"))
+		templates.ExecuteTemplate(w, "index.html", nil)
 	})
 
 	http.ListenAndServe(":9000", router)
