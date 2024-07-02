@@ -9,9 +9,13 @@ services:
     build:
       context: . # Use an image built from the specified dockerfile in the current directory.
       dockerfile: Dockerfile
+    develop:
+      watch:
+        - action: rebuild
+          path: ./
+          target: ./
     ports:
       - "9000:9000" # Forward the exposed port on the container to port on the host machine
-    restart: unless-stopped
     depends_on: 
       - redis # This service depends on redis. Start that first.
     environment: # Pass environment variables to the service
