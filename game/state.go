@@ -12,10 +12,12 @@ func NewPlayer(name string) Player {
 type State struct {
 	Players []Player
 	RoomID  string
+	Deck    []Card
+	Pack    []Card
 }
 
 func NewState() State {
-	return State{Players: []Player{}, RoomID: GenerateID(6)}
+	return State{Players: []Player{}, RoomID: GenerateID(6), Deck: NewDeck(), Pack: []Card{}}
 }
 
 func (s *State) AddPlayer(p Player) {
