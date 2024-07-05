@@ -2,12 +2,15 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"html/template"
 	"io"
 	"log"
 	"net/http"
 	"path/filepath"
+
+	"go-docer/game"
 
 	"github.com/redis/go-redis/v9"
 )
@@ -50,6 +53,19 @@ func main() {
 			w.Write([]byte("error setting data in redis for room"))
 		}
 		w.Write([]byte(fmt.Sprintf("successfully updated room: %s", room_id)))
+	})
+	router.HandleFunc("POST /new_room", func(w http.ResponseWriter, r *http.Request) {
+		state := game.NewState()
+		state.AddPlayer(game.NewPlayer("Tom"))
+		b, err := json.Marshal(state)
+		if err != nil {
+			w.Write([]byte("error converting state to json"))
+		}
+		err = rdb.Set(ctx, state.RoomID, b, 0).Err()
+		if err != nil {
+			w.Write([]byte("error setting data in redis"))
+		}
+		w.Write(b)
 	})
 
 	http.ListenAndServe(":9000", router)
