@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"fmt"
 	"go-docer/database"
 	"go-docer/game"
 	"html/template"
@@ -23,6 +24,8 @@ func Index(w http.ResponseWriter, r *http.Request) {
 
 func GetRoomState(w http.ResponseWriter, r *http.Request) {
 	room_id := r.PathValue("room_id")
+	player_id := r.PathValue("player_id")
+	fmt.Println(player_id)
 	val, err := database.DB.Get(database.CTX, room_id).Result()
 	if err != nil {
 		w.Write([]byte("error reading from redis store"))
@@ -31,7 +34,6 @@ func GetRoomState(w http.ResponseWriter, r *http.Request) {
 	if err := json.Unmarshal([]byte(val), &state); err != nil {
 		w.Write([]byte("error converting json to state struct"))
 	}
-	state.AddPlayer(game.NewPlayer("Bob"))
 	b, err := json.Marshal(state)
 	if err != nil {
 		w.Write([]byte("error converting state to json"))
@@ -40,15 +42,24 @@ func GetRoomState(w http.ResponseWriter, r *http.Request) {
 }
 
 func NewRoom(w http.ResponseWriter, r *http.Request) {
+	err := r.ParseForm()
+	if err != nil {
+		http.Error(w, "Failed to parse form", http.StatusBadRequest)
+		return
+	}
+	name := r.Form.Get("name")
 	state := game.NewState()
-	state.AddPlayer(game.NewPlayer("Tom"))
+	state.AddPlayer(game.NewPlayer(name))
 	b, err := json.Marshal(state)
 	if err != nil {
-		w.Write([]byte("error converting state to json"))
+		http.Error(w, "Failed to marshal state", http.StatusInternalServerError)
+		return
 	}
 	err = database.DB.Set(database.CTX, state.RoomID, b, 0).Err()
 	if err != nil {
-		w.Write([]byte("error setting data in redis"))
+		http.Error(w, "Failed to write to redis db", http.StatusBadRequest)
+		return
 	}
-	w.Write(b)
+	redirect_path := fmt.Sprintf("/room/%s/player/%s", state.RoomID, state.Players[0].ID)
+	w.Header().Set("HX-Redirect", redirect_path)
 }

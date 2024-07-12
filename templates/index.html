@@ -4,12 +4,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://unpkg.com/htmx.org@2.0.0"
+        integrity="sha384-wS5l5IKJBvK6sPTKa2WZ1js3d947pvWXbPJ1OmWfEuxLgeHcEbjUUA5i9V5ZkpCw"
+        crossorigin="anonymous"></script>
     <title>Gandalf</title>
 </head>
 
 <body>
     <h1>Welcome!</h1>
-    <input type="number" />
+    <form hx-post="/new_room" hx-trigger="submit" hx-swap="none">
+        <label for="name">Name</label>
+        <input type="text" id="name" name="name" />
+        <button type="submit">Create Room</button>
+    </form>
 </body>
 
 </html>
