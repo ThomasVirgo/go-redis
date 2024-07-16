@@ -30,14 +30,34 @@ func GetGameState(w http.ResponseWriter, r *http.Request) {
 	}
 	room_id := r.PathValue("room_id")
 	player_id := r.PathValue("player_id")
-	fmt.Println(player_id)
 	state, err := database.GetState(room_id)
 	if err != nil {
 		http.Error(w, "Failed to read state from DB", http.StatusInternalServerError)
 		return
 	}
-	fmt.Println(state.RoomID)
-	err = tmpl.Execute(w, nil)
+	state.GetPlayer(player_id)
+	err = tmpl.Execute(w, state)
+	if err != nil {
+		http.Error(w, "Failed to execute template", http.StatusInternalServerError)
+		return
+	}
+}
+
+func GetPlayerGameState(w http.ResponseWriter, r *http.Request) {
+	tmpl, err := template.ParseFiles("./templates/game_grid.html")
+	if err != nil {
+		http.Error(w, "Failed to parse template", http.StatusInternalServerError)
+		return
+	}
+	room_id := r.PathValue("room_id")
+	player_id := r.PathValue("player_id")
+	state, err := database.GetState(room_id)
+	if err != nil {
+		http.Error(w, "Failed to read state from DB", http.StatusInternalServerError)
+		return
+	}
+	state.GetPlayer(player_id)
+	err = tmpl.Execute(w, state)
 	if err != nil {
 		http.Error(w, "Failed to execute template", http.StatusInternalServerError)
 		return

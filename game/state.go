@@ -53,7 +53,7 @@ func (s *State) GetPlayer(player_id string) *Player {
 			return &player
 		}
 	}
-	return &Player{}
+	return nil
 }
 
 // add tests here

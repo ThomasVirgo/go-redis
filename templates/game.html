@@ -42,6 +42,7 @@
 
         .card-empty {
             background-color: white;
+            color: black;
         }
 
         .card-top {
@@ -51,11 +52,19 @@
 </head>
 
 <body>
-    <div class="grid-container">
+    <div class="grid-container" hx-get="./state" hx-trigger="load delay:1s" hx-swap="outerHTML">
+
         <div class="card card-top">Deck</div>
         <div class="card card-top">Pack</div>
-        <div class="card card-empty"></div>
-        <div class="card card-empty"></div>
+        <div class="card card-empty">Room ID: {{.RoomID}} </div>
+        <div class="card card-empty">
+            <div>Players:</div>
+            <ul>
+                {{range $player := .Players}}
+                <li>{{$player.Name}}</li>
+                {{end}}
+            </ul>
+        </div>
 
         <div class="card">Card 1</div>
         <div class="card">Card 2</div>
