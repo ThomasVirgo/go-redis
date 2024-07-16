@@ -18,8 +18,9 @@ func main() {
 
 	router := http.NewServeMux()
 	router.HandleFunc("GET /", handlers.Index)
-	router.HandleFunc("GET /room/{room_id}/player/{player_id}", handlers.GetRoomState)
+	router.HandleFunc("GET /room/{room_id}/player/{player_id}", handlers.GetGameState)
 	router.HandleFunc("POST /new_room", handlers.NewRoom)
+	router.HandleFunc("POST /join_room", handlers.JoinRoom)
 
 	http.ListenAndServe(":9000", router)
 }
