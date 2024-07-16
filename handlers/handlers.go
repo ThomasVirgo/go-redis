@@ -91,7 +91,7 @@ func NewRoom(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Redirect
-	redirect_path := fmt.Sprintf("/room/%s/player/%s", state.RoomID, state.Players[0].ID)
+	redirect_path := fmt.Sprintf("/room/%s/player/%s/", state.RoomID, state.Players[0].ID)
 	w.Header().Set("HX-Redirect", redirect_path)
 }
 
@@ -126,6 +126,6 @@ func JoinRoom(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	redirect_path := fmt.Sprintf("/room/%s/player/%s", state.RoomID, new_player.ID)
+	redirect_path := fmt.Sprintf("/room/%s/player/%s/", state.RoomID, new_player.ID)
 	w.Header().Set("HX-Redirect", redirect_path)
 }

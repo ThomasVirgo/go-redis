@@ -1,4 +1,4 @@
-<div class="grid-container">
+<div class="grid-container" hx-get="./state" hx-trigger="load delay:1s" hx-swap="outerHTML">
     <div class="card card-top">Deck</div>
     <div class="card card-top">Pack</div>
     <div class="card card-empty">Room ID: {{.RoomID}} </div>
