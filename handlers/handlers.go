@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"encoding/json"
 	"fmt"
 	"go-docer/database"
 	"go-docer/game"
@@ -46,7 +47,7 @@ func GetGameState(w http.ResponseWriter, r *http.Request) {
 func GetPlayerGameState(w http.ResponseWriter, r *http.Request) {
 	tmpl, err := template.ParseFiles("./templates/game_grid.html")
 	if err != nil {
-		http.Error(w, "Failed to parse template", http.StatusInternalServerError)
+		http.Error(w, fmt.Sprintf("Failed to parse template: %s", err), http.StatusInternalServerError)
 		return
 	}
 	room_id := r.PathValue("room_id")
@@ -119,6 +120,12 @@ func JoinRoom(w http.ResponseWriter, r *http.Request) {
 		state.StartGame()
 	}
 
+	state_json, err := json.Marshal(state)
+	if err != nil {
+		http.Error(w, "Failed to convert state to json", http.StatusInternalServerError)
+		return
+	}
+
 	// Update State in DB
 	err = database.SetState(state)
 	if err != nil {
@@ -128,4 +135,5 @@ func JoinRoom(w http.ResponseWriter, r *http.Request) {
 
 	redirect_path := fmt.Sprintf("/room/%s/player/%s/", state.RoomID, new_player.ID)
 	w.Header().Set("HX-Redirect", redirect_path)
+	w.Write(state_json)
 }

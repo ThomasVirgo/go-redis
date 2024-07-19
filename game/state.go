@@ -29,11 +29,11 @@ func (s *State) AddPlayer(p Player) {
 }
 
 func (s *State) DealCards() {
-	for _, player := range s.Players {
-		for range 4 {
+	for i := range s.Players {
+		for range [4]int{} {
 			card := s.Deck[len(s.Deck)-1]
 			s.Deck = s.Deck[:len(s.Deck)-1]
-			player.Cards = append(player.Cards, card)
+			s.Players[i].Cards = append(s.Players[i].Cards, card)
 		}
 	}
 }

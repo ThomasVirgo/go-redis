@@ -11,7 +11,12 @@
         </ul>
     </div>
 
-    <div class="card">Card 1</div>
+    {{range $player := .Players}}
+    {{range $card := $player.Cards}}
+    <div class="card">Suit:{{$card.Suit}} Value:{{$card.Value}}</div>
+    {{end}}
+    {{end}}
+    <!-- <div class="card">Card 1</div>
     <div class="card">Card 2</div>
     <div class="card">Card 3</div>
     <div class="card">Card 4</div>
@@ -26,5 +31,5 @@
     <div class="card">Card 13</div>
     <div class="card">Card 14</div>
     <div class="card">Card 15</div>
-    <div class="card">Card 16</div>
+    <div class="card">Card 16</div> -->
 </div>
