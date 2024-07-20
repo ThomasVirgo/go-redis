@@ -1,5 +1,15 @@
 package game
 
+import "fmt"
+
+type Command string
+
+const (
+	SHOW_DECK             Command = "show_deck"
+	PLAY_STRAIGHT_TO_PACK Command = "play_straight_to_pack"
+	TAKE_FROM_PACK        Command = "take_from_pack"
+)
+
 type Player struct {
 	ID    string
 	Name  string
@@ -47,13 +57,20 @@ func (s *State) ShouldStart() bool {
 	return s.NumberPlayers == len(s.Players)
 }
 
-func (s *State) GetPlayer(player_id string) *Player {
-	for _, player := range s.Players {
-		if player.ID == player_id {
-			return &player
-		}
-	}
-	return nil
+func (s *State) IncrementTurn() {
+	s.Turn += 1
 }
 
-// add tests here
+func (s *State) GetPlayersTurn() *Player {
+	index := s.Turn % s.NumberPlayers
+	return &s.Players[index]
+}
+
+// func (s *State) TakeTurn(command Command) {
+// 	player := s.GetPlayersTurn()
+
+// }
+
+func (s *State) GetPlayersTurnString() string {
+	return fmt.Sprintf("%s's turn!", s.GetPlayersTurn().Name)
+}

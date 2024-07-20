@@ -30,13 +30,12 @@ func GetGameState(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	room_id := r.PathValue("room_id")
-	player_id := r.PathValue("player_id")
+	// player_id := r.PathValue("player_id")
 	state, err := database.GetState(room_id)
 	if err != nil {
 		http.Error(w, "Failed to read state from DB", http.StatusInternalServerError)
 		return
 	}
-	state.GetPlayer(player_id)
 	err = tmpl.Execute(w, state)
 	if err != nil {
 		http.Error(w, "Failed to execute template", http.StatusInternalServerError)
@@ -51,16 +50,15 @@ func GetPlayerGameState(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	room_id := r.PathValue("room_id")
-	player_id := r.PathValue("player_id")
+	// player_id := r.PathValue("player_id")
 	state, err := database.GetState(room_id)
 	if err != nil {
 		http.Error(w, "Failed to read state from DB", http.StatusInternalServerError)
 		return
 	}
-	state.GetPlayer(player_id)
-	err = tmpl.Execute(w, state)
+	err = tmpl.Execute(w, &state)
 	if err != nil {
-		http.Error(w, "Failed to execute template", http.StatusInternalServerError)
+		http.Error(w, fmt.Sprintf("Failed to execute template: %s", err), http.StatusInternalServerError)
 		return
 	}
 }
@@ -136,4 +134,25 @@ func JoinRoom(w http.ResponseWriter, r *http.Request) {
 	redirect_path := fmt.Sprintf("/room/%s/player/%s/", state.RoomID, new_player.ID)
 	w.Header().Set("HX-Redirect", redirect_path)
 	w.Write(state_json)
+}
+
+func TakeTurn(w http.ResponseWriter, r *http.Request) {
+	room_id := r.PathValue("room_id")
+
+	// Read from DB
+	state, err := database.GetState(room_id)
+	if err != nil {
+		http.Error(w, "Failed to read from database", http.StatusBadRequest)
+		return
+	}
+
+	// Take Turn
+	state.IncrementTurn()
+
+	// Update State in DB
+	err = database.SetState(state)
+	if err != nil {
+		http.Error(w, "Failed to write to database", http.StatusBadRequest)
+		return
+	}
 }

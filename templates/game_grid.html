@@ -1,5 +1,8 @@
 <div class="grid-container" hx-get="./state" hx-trigger="load delay:1s" hx-swap="outerHTML">
-    <div class="card card-top">Deck</div>
+    {{if .Started}}
+    <div>{{.GetPlayersTurnString}}</div>
+    {{end}}
+    <div class="card card-top" hx-post="./take_turn" hx-trigger="click" hx-swap="none">Deck</div>
     <div class="card card-top">Pack</div>
     <div class="card card-empty">Room ID: {{.RoomID}} </div>
     <div class="card card-empty">

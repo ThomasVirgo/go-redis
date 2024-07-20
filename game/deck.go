@@ -2,30 +2,30 @@ package game
 
 import "math/rand"
 
-type Suit int
-type Value int
+type Suit string
+type Value string
 
 const (
-	DIAMONDS Suit = 1
-	HEARTS   Suit = 2
-	SPADES   Suit = 3
-	CLUBS    Suit = 4
+	DIAMONDS Suit = "♦"
+	HEARTS   Suit = "♥"
+	SPADES   Suit = "♠"
+	CLUBS    Suit = "♣"
 )
 
 const (
-	ACE   Value = 1
-	TWO   Value = 2
-	THREE Value = 3
-	FOUR  Value = 4
-	FIVE  Value = 5
-	SIX   Value = 6
-	SEVEN Value = 7
-	EIGHT Value = 8
-	NINE  Value = 9
-	TEN   Value = 10
-	JACK  Value = 11
-	QUEEN Value = 12
-	KING  Value = 13
+	ACE   Value = "A"
+	TWO   Value = "2"
+	THREE Value = "3"
+	FOUR  Value = "4"
+	FIVE  Value = "5"
+	SIX   Value = "6"
+	SEVEN Value = "7"
+	EIGHT Value = "8"
+	NINE  Value = "9"
+	TEN   Value = "10"
+	JACK  Value = "11"
+	QUEEN Value = "12"
+	KING  Value = "13"
 )
 
 type Card struct {
