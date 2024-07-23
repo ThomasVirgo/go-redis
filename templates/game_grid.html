@@ -1,38 +1,25 @@
-<div class="grid-container" hx-get="./state" hx-trigger="load delay:1s" hx-swap="outerHTML">
-    {{if .Started}}
-    <div>{{.GetPlayersTurnString}}</div>
+<div id="game-container" hx-get="./state" hx-trigger="load delay:1s" hx-swap="outerHTML">
+    {{if .State.Started}}
+    <div>{{.State.GetPlayersTurnString}}</div>
     {{end}}
-    <div class="card card-top" hx-post="./take_turn" hx-trigger="click" hx-swap="none">Deck</div>
-    <div class="card card-top">Pack</div>
-    <div class="card card-empty">Room ID: {{.RoomID}} </div>
-    <div class="card card-empty">
-        <div>Players:</div>
-        <ul>
-            {{range $player := .Players}}
-            <li>{{$player.Name}}</li>
-            {{end}}
-        </ul>
-    </div>
+    <div class="grid-container">
+        <div class="card card-top" hx-post="./take_turn" hx-trigger="click" hx-swap="outerHTML"
+            hx-target="#game-container">Deck</div>
+        <div class="card card-top">Pack</div>
+        <div class="card card-empty"></div>
+        <div class="card card-empty">
+            <div>Players:</div>
+            <ul>
+                {{range $player := .State.Players}}
+                <li>{{$player.Name}}</li>
+                {{end}}
+            </ul>
+        </div>
 
-    {{range $player := .Players}}
-    {{range $card := $player.Cards}}
-    <div class="card">Suit:{{$card.Suit}} Value:{{$card.Value}}</div>
-    {{end}}
-    {{end}}
-    <!-- <div class="card">Card 1</div>
-    <div class="card">Card 2</div>
-    <div class="card">Card 3</div>
-    <div class="card">Card 4</div>
-    <div class="card">Card 5</div>
-    <div class="card">Card 6</div>
-    <div class="card">Card 7</div>
-    <div class="card">Card 8</div>
-    <div class="card">Card 9</div>
-    <div class="card">Card 10</div>
-    <div class="card">Card 11</div>
-    <div class="card">Card 12</div>
-    <div class="card">Card 13</div>
-    <div class="card">Card 14</div>
-    <div class="card">Card 15</div>
-    <div class="card">Card 16</div> -->
+        {{range $player := .State.Players}}
+        {{range $card := $player.Cards}}
+        <div class="card">Suit:{{$card.Suit}} Value:{{$card.Value}}</div>
+        {{end}}
+        {{end}}
+    </div>
 </div>

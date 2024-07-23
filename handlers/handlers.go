@@ -30,17 +30,44 @@ func GetGameState(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	room_id := r.PathValue("room_id")
-	// player_id := r.PathValue("player_id")
+	player_id := r.PathValue("player_id")
 	state, err := database.GetState(room_id)
 	if err != nil {
 		http.Error(w, "Failed to read state from DB", http.StatusInternalServerError)
 		return
 	}
-	err = tmpl.Execute(w, state)
+	template_state := TemplateState{State: &state, IsTurn: state.IsTurn(player_id)}
+	err = tmpl.Execute(w, template_state)
 	if err != nil {
 		http.Error(w, "Failed to execute template", http.StatusInternalServerError)
 		return
 	}
+}
+
+func CommandsTemplate(w http.ResponseWriter, r *http.Request) {
+	tmpl, err := template.ParseFiles("./templates/commands.html")
+	if err != nil {
+		http.Error(w, "Failed to parse template", http.StatusInternalServerError)
+		return
+	}
+	room_id := r.PathValue("room_id")
+	player_id := r.PathValue("player_id")
+	state, err := database.GetState(room_id)
+	if err != nil {
+		http.Error(w, "Failed to read state from DB", http.StatusInternalServerError)
+		return
+	}
+	template_state := TemplateState{State: &state, IsTurn: state.IsTurn(player_id)}
+	err = tmpl.Execute(w, template_state)
+	if err != nil {
+		http.Error(w, "Failed to execute template", http.StatusInternalServerError)
+		return
+	}
+}
+
+type TemplateState struct {
+	State  *game.State
+	IsTurn bool
 }
 
 func GetPlayerGameState(w http.ResponseWriter, r *http.Request) {
@@ -50,13 +77,16 @@ func GetPlayerGameState(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	room_id := r.PathValue("room_id")
-	// player_id := r.PathValue("player_id")
+	player_id := r.PathValue("player_id")
 	state, err := database.GetState(room_id)
 	if err != nil {
 		http.Error(w, "Failed to read state from DB", http.StatusInternalServerError)
 		return
 	}
-	err = tmpl.Execute(w, &state)
+
+	template_state := TemplateState{State: &state, IsTurn: state.IsTurn(player_id)}
+
+	err = tmpl.Execute(w, &template_state)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Failed to execute template: %s", err), http.StatusInternalServerError)
 		return
@@ -137,7 +167,13 @@ func JoinRoom(w http.ResponseWriter, r *http.Request) {
 }
 
 func TakeTurn(w http.ResponseWriter, r *http.Request) {
+	tmpl, err := template.ParseFiles("./templates/game_grid.html")
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Failed to parse template: %s", err), http.StatusInternalServerError)
+		return
+	}
 	room_id := r.PathValue("room_id")
+	player_id := r.PathValue("player_id")
 
 	// Read from DB
 	state, err := database.GetState(room_id)
@@ -153,6 +189,14 @@ func TakeTurn(w http.ResponseWriter, r *http.Request) {
 	err = database.SetState(state)
 	if err != nil {
 		http.Error(w, "Failed to write to database", http.StatusBadRequest)
+		return
+	}
+
+	template_state := TemplateState{State: &state, IsTurn: state.IsTurn(player_id)}
+
+	err = tmpl.Execute(w, &template_state)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Failed to execute template: %s", err), http.StatusInternalServerError)
 		return
 	}
 }

@@ -1,0 +1,15 @@
+<div id="command-container" hx-get="./commands" hx-trigger="load delay:1s" hx-swap="outerHTML">
+    {{if .IsTurn}}
+    {{if .State.Started}}
+    <form>
+        <select id="command" name="command">
+            <option value="Take Card from Deck">Take Card from Deck</option>
+            <option value="Take Card from Pack">Take Card from Pack</option>
+            <option value="Play Card to Pack">Play Card to Pack</option>
+            <option value="Swap Card">Swap Card</option>
+        </select>
+        <button type="submit">Submit</button>
+    </form>
+    {{end}}
+    {{end}}
+</div>

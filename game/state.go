@@ -1,13 +1,16 @@
 package game
 
-import "fmt"
+import (
+	"fmt"
+)
 
 type Command string
 
 const (
-	SHOW_DECK             Command = "show_deck"
-	PLAY_STRAIGHT_TO_PACK Command = "play_straight_to_pack"
-	TAKE_FROM_PACK        Command = "take_from_pack"
+	SHOW_DECK                        Command = "show_deck"
+	PLAY_STRAIGHT_TO_PACK            Command = "play_straight_to_pack"
+	SWAP_DECK_CARD_WITH_CARD_IN_HAND Command = "swap_deck_card_with_card_in_hand"
+	END_TURN                         Command = "end_turn"
 )
 
 type Player struct {
@@ -48,9 +51,16 @@ func (s *State) DealCards() {
 	}
 }
 
+func (s *State) MoveCardFromDeckToPack() {
+	card := s.Deck[len(s.Deck)-1]
+	s.Deck = s.Deck[:len(s.Deck)-1]
+	s.Pack = append(s.Pack, card)
+}
+
 func (s *State) StartGame() {
 	s.Started = true
 	s.DealCards()
+	s.MoveCardFromDeckToPack()
 }
 
 func (s *State) ShouldStart() bool {
@@ -66,11 +76,51 @@ func (s *State) GetPlayersTurn() *Player {
 	return &s.Players[index]
 }
 
-// func (s *State) TakeTurn(command Command) {
-// 	player := s.GetPlayersTurn()
-
-// }
-
 func (s *State) GetPlayersTurnString() string {
 	return fmt.Sprintf("%s's turn!", s.GetPlayersTurn().Name)
+}
+
+func (s *State) IsTurn(player_id string) bool {
+	players_turn := s.GetPlayersTurn()
+	return players_turn.ID == player_id
+}
+
+func (s *State) ShowDeck() {
+	card := &s.Deck[len(s.Deck)-1]
+	card.FaceUp = true
+}
+
+func (s *State) PlayStraightToPack() error {
+	card := s.Deck[len(s.Deck)-1]
+	if !card.FaceUp {
+		return CommandError{message: "expected card at top of deck to be face up"}
+	}
+	s.Pack = append(s.Pack, card)
+	s.Deck = s.Deck[:len(s.Deck)-1]
+	return nil
+}
+
+func (s *State) ProcessCommand(command Command) error {
+	switch command {
+	case END_TURN:
+		s.IncrementTurn()
+		return nil
+	case SHOW_DECK:
+		s.ShowDeck()
+		return nil
+	case PLAY_STRAIGHT_TO_PACK:
+		err := s.PlayStraightToPack()
+		return err
+	case SWAP_DECK_CARD_WITH_CARD_IN_HAND:
+		// s.SwapDeckCardWithCardInHand()
+	}
+	return nil
+}
+
+type CommandError struct {
+	message string
+}
+
+func (c CommandError) Error() string {
+	return c.message
 }
