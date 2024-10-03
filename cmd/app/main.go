@@ -26,7 +26,7 @@ func main() {
 
 	// game page
 	router.HandleFunc("GET /room/{room_id}/player/{player_id}/", handlers.GetGameState)
-	router.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
+	router.HandleFunc("GET /ws", func(w http.ResponseWriter, r *http.Request) {
 		socket.ServeWebSocket(hub, w, r)
 	})
 
