@@ -23,76 +23,6 @@ func Index(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func GetGameState(w http.ResponseWriter, r *http.Request) {
-	tmpl, err := template.ParseFiles("./templates/game.html")
-	if err != nil {
-		http.Error(w, "Failed to parse template", http.StatusInternalServerError)
-		return
-	}
-	room_id := r.PathValue("room_id")
-	player_id := r.PathValue("player_id")
-	state, err := database.GetState(room_id)
-	if err != nil {
-		http.Error(w, "Failed to read state from DB", http.StatusInternalServerError)
-		return
-	}
-	template_state := TemplateState{State: &state, IsTurn: state.IsTurn(player_id)}
-	err = tmpl.Execute(w, template_state)
-	if err != nil {
-		http.Error(w, "Failed to execute template", http.StatusInternalServerError)
-		return
-	}
-}
-
-func CommandsTemplate(w http.ResponseWriter, r *http.Request) {
-	tmpl, err := template.ParseFiles("./templates/commands.html")
-	if err != nil {
-		http.Error(w, "Failed to parse template", http.StatusInternalServerError)
-		return
-	}
-	room_id := r.PathValue("room_id")
-	player_id := r.PathValue("player_id")
-	state, err := database.GetState(room_id)
-	if err != nil {
-		http.Error(w, "Failed to read state from DB", http.StatusInternalServerError)
-		return
-	}
-	template_state := TemplateState{State: &state, IsTurn: state.IsTurn(player_id)}
-	err = tmpl.Execute(w, template_state)
-	if err != nil {
-		http.Error(w, "Failed to execute template", http.StatusInternalServerError)
-		return
-	}
-}
-
-type TemplateState struct {
-	State  *game.State
-	IsTurn bool
-}
-
-func GetPlayerGameState(w http.ResponseWriter, r *http.Request) {
-	tmpl, err := template.ParseFiles("./templates/game_grid.html")
-	if err != nil {
-		http.Error(w, fmt.Sprintf("Failed to parse template: %s", err), http.StatusInternalServerError)
-		return
-	}
-	room_id := r.PathValue("room_id")
-	player_id := r.PathValue("player_id")
-	state, err := database.GetState(room_id)
-	if err != nil {
-		http.Error(w, "Failed to read state from DB", http.StatusInternalServerError)
-		return
-	}
-
-	template_state := TemplateState{State: &state, IsTurn: state.IsTurn(player_id)}
-
-	err = tmpl.Execute(w, &template_state)
-	if err != nil {
-		http.Error(w, fmt.Sprintf("Failed to execute template: %s", err), http.StatusInternalServerError)
-		return
-	}
-}
-
 func NewRoom(w http.ResponseWriter, r *http.Request) {
 	// Get Form Data
 	err := r.ParseForm()
@@ -166,37 +96,28 @@ func JoinRoom(w http.ResponseWriter, r *http.Request) {
 	w.Write(state_json)
 }
 
-func TakeTurn(w http.ResponseWriter, r *http.Request) {
-	tmpl, err := template.ParseFiles("./templates/game_grid.html")
+func GetGameState(w http.ResponseWriter, r *http.Request) {
+	tmpl, err := template.ParseFiles("./templates/game.html")
 	if err != nil {
-		http.Error(w, fmt.Sprintf("Failed to parse template: %s", err), http.StatusInternalServerError)
+		http.Error(w, "Failed to parse template", http.StatusInternalServerError)
 		return
 	}
 	room_id := r.PathValue("room_id")
 	player_id := r.PathValue("player_id")
-
-	// Read from DB
 	state, err := database.GetState(room_id)
 	if err != nil {
-		http.Error(w, "Failed to read from database", http.StatusBadRequest)
+		http.Error(w, "Failed to read state from DB", http.StatusInternalServerError)
 		return
 	}
-
-	// Take Turn
-	state.IncrementTurn()
-
-	// Update State in DB
-	err = database.SetState(state)
-	if err != nil {
-		http.Error(w, "Failed to write to database", http.StatusBadRequest)
-		return
-	}
-
 	template_state := TemplateState{State: &state, IsTurn: state.IsTurn(player_id)}
-
-	err = tmpl.Execute(w, &template_state)
+	err = tmpl.Execute(w, template_state)
 	if err != nil {
-		http.Error(w, fmt.Sprintf("Failed to execute template: %s", err), http.StatusInternalServerError)
+		http.Error(w, "Failed to execute template", http.StatusInternalServerError)
 		return
 	}
+}
+
+type TemplateState struct {
+	State  *game.State
+	IsTurn bool
 }

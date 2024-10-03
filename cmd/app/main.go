@@ -6,6 +6,7 @@ import (
 
 	"go-docer/database"
 	"go-docer/handlers"
+	"go-docer/socket"
 )
 
 func main() {
@@ -15,15 +16,19 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-
+	hub := socket.NewHub()
+	go hub.Run()
 	router := http.NewServeMux()
+	// landing page
 	router.HandleFunc("GET /", handlers.Index)
-	router.HandleFunc("GET /room/{room_id}/player/{player_id}/", handlers.GetGameState)
-	router.HandleFunc("GET /room/{room_id}/player/{player_id}/state", handlers.GetPlayerGameState)
-	router.HandleFunc("GET /room/{room_id}/player/{player_id}/commands", handlers.CommandsTemplate)
-	router.HandleFunc("POST /room/{room_id}/player/{player_id}/take_turn", handlers.TakeTurn)
 	router.HandleFunc("POST /new_room", handlers.NewRoom)
 	router.HandleFunc("POST /join_room", handlers.JoinRoom)
+
+	// game page
+	router.HandleFunc("GET /room/{room_id}/player/{player_id}/", handlers.GetGameState)
+	router.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
+		socket.ServeWebSocket(hub, w, r)
+	})
 
 	http.ListenAndServe(":9000", router)
 }

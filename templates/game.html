@@ -4,60 +4,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://unpkg.com/htmx.org@2.0.0"
-        integrity="sha384-wS5l5IKJBvK6sPTKa2WZ1js3d947pvWXbPJ1OmWfEuxLgeHcEbjUUA5i9V5ZkpCw"
-        crossorigin="anonymous"></script>
     <title>Gandalf</title>
-    <style>
-        body {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            font-family: Arial, sans-serif;
-        }
-
-        .grid-container {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            grid-gap: 10px;
-            padding: 10px;
-            width: 100%;
-            max-width: 800px;
-            box-sizing: border-box;
-        }
-
-        .card {
-            background-color: #a21043;
-            color: white;
-            border-radius: 5px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100px;
-            text-align: center;
-            font-size: 1.2em;
-        }
-
-        .card-empty {
-            background-color: white;
-            color: black;
-        }
-
-        .card-top {
-            background-color: #4229a5;
-        }
-    </style>
 </head>
 
 <body>
     <div>
         <div>Room ID: {{.State.RoomID}}</div>
     </div>
-    <div id="game-container" hx-get="./state" hx-trigger="load" hx-swap="outerHTML"></div>
-    <div id="command-container" hx-get="./commands" hx-trigger="load" hx-swap="outerHTML"></div>
+    <div id="game-container"></div>
 </body>
 
 </html>

@@ -53,6 +53,7 @@ func NewDeck() []Card {
 			cards = append(cards, Card{Suit: suit, Value: value, FaceUp: false})
 		}
 	}
+
 	for i := range cards {
 		j := rand.Intn(i + 1)
 		cards[i], cards[j] = cards[j], cards[i]
